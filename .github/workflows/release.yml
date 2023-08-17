@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "jvm-dependency-resolver-*"
+      - "jvm-dependency-loader-*"
 permissions:
   contents: write
 

@@ -1,4 +1,4 @@
-package inga.jvmdependencyresolver;
+package inga.jvmdependencyloader;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DependencyResolver implements AutoCloseable {
+public class DependencyLoader implements AutoCloseable {
     private URLClassLoader classLoader;
 
     public void loadProject(String inputPath) {

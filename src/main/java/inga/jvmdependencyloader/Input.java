@@ -1,4 +1,4 @@
-package inga.jvmdependencyresolver;
+package inga.jvmdependencyloader;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

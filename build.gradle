@@ -2,14 +2,14 @@ plugins {
     id 'java'
 }
 
-group = 'inga.jvmdependencyresolver'
-version = '0.1.0'
+group = 'inga.jvmdependencyloader'
+version = '0.1.1'
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
-        attributes "Main-Class": "inga.jvmdependencyresolver.Main"
+        attributes "Main-Class": "inga.jvmdependencyloader.Main"
     }
 
     from {
