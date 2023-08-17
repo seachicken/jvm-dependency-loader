@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "jvm-dependency-resolver-*"
+permissions:
+  contents: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Build with Gradle
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: build
+
+    - name: Upload to GitHub Releases
+      run: gh release create --title ${{ github.ref_name }} --generate-notes ${{ github.ref_name }} ./build/libs/${{ github.ref_name }}.jar
+
