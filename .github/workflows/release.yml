@@ -25,7 +25,7 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: build -x test
+        arguments: assemble
 
     - name: Upload to GitHub Releases
       run: gh release create --title ${{ github.ref_name }} --generate-notes ${{ github.ref_name }} ./build/libs/${{ github.ref_name }}.jar
