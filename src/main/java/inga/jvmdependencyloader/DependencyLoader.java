@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 public class DependencyLoader implements AutoCloseable {
     private final Map<Path, URLClassLoader> classLoaders = new HashMap<>();
+    private final Map<Path, Path> baseDirCache = new HashMap<>();
 
     public List<Method> readMethods(String fqcn, Path from) {
         var baseDir = findProjectBaseDir(from);
@@ -47,12 +48,18 @@ public class DependencyLoader implements AutoCloseable {
     }
 
     private Path findProjectBaseDir(Path path) {
-        while ((path = path.getParent()) != null) {
-            var baseDir = evaluateBaseDir(path);
-            if (baseDir.equals("null object or invalid expression")) {
-                continue;
+        if (baseDirCache.containsKey(path)) {
+            return baseDirCache.get(path);
+        } else {
+            Path currentPath = path.getParent();
+            while ((currentPath = currentPath.getParent()) != null) {
+                var baseDir = evaluateBaseDir(currentPath);
+                if (baseDir.equals("null object or invalid expression")) {
+                    continue;
+                }
+                baseDirCache.put(path, Path.of(baseDir));
+                return Path.of(baseDir);
             }
-            return Path.of(baseDir);
         }
         return null;
     }
