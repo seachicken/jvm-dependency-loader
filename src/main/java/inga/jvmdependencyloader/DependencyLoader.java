@@ -6,50 +6,66 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DependencyLoader implements AutoCloseable {
-    private URLClassLoader classLoader;
+    private final Map<Path, URLClassLoader> classLoaders = new HashMap<>();
 
-    public void loadProject(String inputPath) {
-        var path = Path.of(inputPath);
-        copyDependencies(path);
-
-        if (classLoader != null) {
-            try {
-                classLoader.close();
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
+    public List<Method> readMethods(String fqcn, Path from) {
+        var baseDir = findProjectBaseDir(from);
+        URLClassLoader classLoader;
+        if (classLoaders.containsKey(baseDir)) {
+            classLoader = classLoaders.get(baseDir);
+        } else {
+            copyDependencies(baseDir);
+            classLoader = new URLClassLoader(findJarUrls(baseDir.resolve("target/dependency")));
+            classLoaders.put(baseDir, classLoader);
         }
-        classLoader = new URLClassLoader(findJarUrls(path.resolve("target/dependency")));
-    }
 
-    public List<Method> readMethods(String fqcn) {
-        if (classLoader == null) {
-            throw new IllegalStateException("project not loaded");
-        }
         try {
             var methods = classLoader.loadClass(fqcn).getDeclaredMethods();
             return Arrays.stream(methods)
                     .map(m -> new Method(
                             m.getName(),
-                            Arrays.stream(m.getParameterTypes()).map(Class::getName).collect(Collectors.toList()),
-                            m.getReturnType().getName()
+                            Arrays.stream(m.getParameterTypes())
+                                    .map(t -> new Type(t.getName(), t.isInterface()))
+                                    .collect(Collectors.toList()),
+                            new Type(m.getReturnType().getName(), m.getReturnType().isInterface())
                     ))
                     .collect(Collectors.toList());
         } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(e);
+            return Collections.emptyList();
         }
     }
 
     @Override
     public void close() throws Exception {
-        if (classLoader != null) {
-            classLoader.close();
+        for (var loader : classLoaders.values()) {
+            loader.close();
+        }
+    }
+
+    private Path findProjectBaseDir(Path path) {
+        while ((path = path.getParent()) != null) {
+            var baseDir = evaluateBaseDir(path);
+            if (baseDir.equals("null object or invalid expression")) {
+                continue;
+            }
+            return Path.of(baseDir);
+        }
+        return null;
+    }
+
+    private String evaluateBaseDir(Path path) {
+        try {
+            var process = new ProcessBuilder("mvn", "help:evaluate", "-Dexpression=project.basedir", "-q", "-DforceStdout")
+                    .directory(path.toFile())
+                    .start();
+            process.waitFor();
+            return new String(process.getInputStream().readAllBytes());
+        } catch (IOException | InterruptedException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 

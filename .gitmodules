@@ -1,0 +1,3 @@
+[submodule "src/test/resources/fixtures/spring-tutorials"]
+	path = src/test/resources/fixtures/spring-tutorials
+	url = git@github.com:seachicken/tutorials.git
