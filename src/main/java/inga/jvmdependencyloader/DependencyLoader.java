@@ -15,6 +15,9 @@ public class DependencyLoader implements AutoCloseable {
 
     public List<Method> readMethods(String fqcn, Path from) {
         var baseDir = findProjectBaseDir(from);
+        if (baseDir == null) {
+            return Collections.emptyList();
+        }
         URLClassLoader classLoader;
         if (classLoaders.containsKey(baseDir)) {
             classLoader = classLoaders.get(baseDir);
