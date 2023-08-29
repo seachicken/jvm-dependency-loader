@@ -1,5 +1,6 @@
 package inga.jvmdependencyloader;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -59,32 +60,16 @@ public class DependencyLoader implements AutoCloseable {
     private Path findProjectBaseDir(Path path) {
         Path currentPath = path.getParent();
         while ((currentPath = currentPath.getParent()) != null) {
-            var baseDir = evaluateBaseDir(currentPath);
-            if (baseDir.equals("null object or invalid expression")) {
-                continue;
+            if (Arrays.stream(currentPath.toFile().listFiles())
+                    .filter(File::isFile)
+                    .anyMatch(f -> List.of("pom.xml", "build.gradle").contains(f.getName()))) {
+                return currentPath;
             }
-            return Path.of(baseDir);
         }
         return null;
     }
 
-    private String evaluateBaseDir(Path path) {
-        try {
-            var process = new ProcessBuilder("mvn", "help:evaluate", "-Dexpression=project.basedir", "-q", "-DforceStdout")
-                    .directory(path.toFile())
-                    .start();
-            process.waitFor();
-            return new String(process.getInputStream().readAllBytes());
-        } catch (IOException | InterruptedException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
     private void copyDependencies(Path path) {
-        if (!Files.exists(path.resolve("pom.xml"))) {
-            throw new IllegalArgumentException("pom.xml not found");
-        }
-
         try {
             var process = new ProcessBuilder("mvn", "dependency:copy-dependencies")
                 .directory(path.toFile())
@@ -96,6 +81,9 @@ public class DependencyLoader implements AutoCloseable {
     }
 
     private URL[] findJarUrls(Path dependencyDir) {
+        if (!Files.exists(dependencyDir)) {
+            return new URL[]{};
+        }
         var results = new ArrayList<URL>();
         for (var file : dependencyDir.toFile().listFiles()) {
             if (file.isFile() && file.getName().endsWith(".jar")) {
