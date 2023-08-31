@@ -80,7 +80,7 @@ public class DependencyLoader implements AutoCloseable {
     private void copyDependencies(Path path) {
         try {
             System.out.println(" copyDependencies begin. path: " + path);
-            var process = new ProcessBuilder("mvn", "dependency:copy-dependencies")
+            var process = new ProcessBuilder("mvn", "dependency:copy-dependencies", "-q")
                 .directory(path.toFile())
                 .start();
             System.out.println(" copyDependencies started");
