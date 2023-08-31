@@ -14,14 +14,17 @@ public class DependencyLoader implements AutoCloseable {
     private final Map<Path, URLClassLoader> classLoaders = new HashMap<>();
 
     public List<Method> readMethods(String fqcn, Path from) {
+        System.out.println("begin readMethods. fqcn: " + fqcn + ", from: " + from);
         var baseDir = classLoaders.keySet()
                 .stream()
                 .filter(p -> p.toString().startsWith(p.toString()))
                 .findFirst()
                 .orElse(null);
+        System.out.println("baseDir: " + baseDir);
         if (baseDir == null) {
             baseDir = findProjectBaseDir(from);
         }
+        System.out.println("baseDir2: " + baseDir);
         if (baseDir == null) {
             return Collections.emptyList();
         }
@@ -29,13 +32,17 @@ public class DependencyLoader implements AutoCloseable {
         if (classLoaders.containsKey(baseDir)) {
             classLoader = classLoaders.get(baseDir);
         } else {
+            System.out.println("begin copy");
             copyDependencies(baseDir);
+            System.out.println("end copy");
             classLoader = new URLClassLoader(findJarUrls(baseDir.resolve("target/dependency")));
+            System.out.println("created loader");
             classLoaders.put(baseDir, classLoader);
         }
 
         try {
             var methods = classLoader.loadClass(fqcn).getDeclaredMethods();
+            System.out.println("end methods: " + methods);
             return Arrays.stream(methods)
                     .map(m -> new Method(
                             m.getName(),
@@ -46,6 +53,7 @@ public class DependencyLoader implements AutoCloseable {
                     ))
                     .collect(Collectors.toList());
         } catch (ClassNotFoundException e) {
+            System.out.println("end e: " + e);
             return Collections.emptyList();
         }
     }
