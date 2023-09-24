@@ -1,6 +1,5 @@
 package inga.jvmdependencyloader;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,7 +19,7 @@ public class DependencyLoader implements AutoCloseable {
                 .findFirst()
                 .orElse(null);
         if (baseDir == null) {
-            baseDir = findProjectBaseDir(from);
+            baseDir = from;
         }
         if (baseDir == null) {
             return Collections.emptyList();
@@ -55,18 +54,6 @@ public class DependencyLoader implements AutoCloseable {
         for (var loader : classLoaders.values()) {
             loader.close();
         }
-    }
-
-    private Path findProjectBaseDir(Path path) {
-        Path currentPath = path.getParent();
-        while ((currentPath = currentPath.getParent()) != null) {
-            if (Arrays.stream(currentPath.toFile().listFiles())
-                    .filter(File::isFile)
-                    .anyMatch(f -> List.of("pom.xml", "build.gradle").contains(f.getName()))) {
-                return currentPath;
-            }
-        }
-        return null;
     }
 
     private void copyDependencies(Path path) {

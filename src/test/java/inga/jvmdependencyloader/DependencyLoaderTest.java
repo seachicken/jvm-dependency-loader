@@ -25,7 +25,7 @@ class DependencyLoaderTest {
     void readMethods() {
         var actual = loader.readMethods(
                 "org.springframework.web.util.UriComponentsBuilder",
-                getFixturesPath("spring-tutorials/lightrun/api-service/src/main/java/com/baeldung/apiservice/adapters/users/UserRepository.java")
+                getFixturesPath("spring-tutorials/lightrun/api-service")
         );
         assertThat(actual).size().isEqualTo(68);
     }
