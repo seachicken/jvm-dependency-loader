@@ -13,24 +13,9 @@ public class DependencyLoader implements AutoCloseable {
     private final Map<Path, URLClassLoader> classLoaders = new HashMap<>();
 
     public List<Method> readMethods(String fqcn, Path from) {
-        var baseDir = classLoaders.keySet()
-                .stream()
-                .filter(p -> p.toString().startsWith(p.toString()))
-                .findFirst()
-                .orElse(null);
-        if (baseDir == null) {
-            baseDir = from;
-        }
-        if (baseDir == null) {
+        URLClassLoader classLoader = loadClassLoader(from);
+        if (classLoader == null) {
             return Collections.emptyList();
-        }
-        URLClassLoader classLoader;
-        if (classLoaders.containsKey(baseDir)) {
-            classLoader = classLoaders.get(baseDir);
-        } else {
-            copyDependencies(baseDir);
-            classLoader = new URLClassLoader(findJarUrls(baseDir.resolve("target/dependency")));
-            classLoaders.put(baseDir, classLoader);
         }
 
         try {
@@ -47,6 +32,49 @@ public class DependencyLoader implements AutoCloseable {
         } catch (ClassNotFoundException e) {
             return Collections.emptyList();
         }
+    }
+
+    public List<Type> readHierarchy(String fqcn, Path from) {
+        URLClassLoader classLoader = loadClassLoader(from);
+        if (classLoader == null) {
+            return Collections.emptyList();
+        }
+
+        try {
+            var clazz = classLoader.loadClass(fqcn);
+            var results = new ArrayList<Type>();
+            while (clazz != null) {
+                results.add(new Type(clazz.getName(), clazz.isInterface()));
+                clazz = clazz.getSuperclass();
+            }
+            Collections.reverse(results);
+            return results;
+        } catch (ClassNotFoundException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    private URLClassLoader loadClassLoader(Path from) {
+        var baseDir = classLoaders.keySet()
+                .stream()
+                .filter(p -> p.toString().startsWith(p.toString()))
+                .findFirst()
+                .orElse(null);
+        if (baseDir == null) {
+            baseDir = from;
+        }
+        if (baseDir == null) {
+            return null;
+        }
+        URLClassLoader classLoader;
+        if (classLoaders.containsKey(baseDir)) {
+            classLoader = classLoaders.get(baseDir);
+        } else {
+            copyDependencies(baseDir);
+            classLoader = new URLClassLoader(findJarUrls(baseDir.resolve("target/dependency")));
+            classLoaders.put(baseDir, classLoader);
+        }
+        return classLoader;
     }
 
     @Override

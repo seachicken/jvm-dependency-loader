@@ -30,6 +30,18 @@ class DependencyLoaderTest {
         assertThat(actual).size().isEqualTo(68);
     }
 
+    @Test
+    void readHierarchy() {
+        var actual = loader.readHierarchy(
+                "java.lang.String",
+                getFixturesPath("spring-tutorials/lightrun/api-service")
+        );
+        assertThat(actual).containsExactly(
+                new Type("java.lang.Object", false),
+                new Type("java.lang.String", false)
+        );
+    }
+
     private Path getFixturesPath(String path) {
         return Path.of(getClass().getClassLoader().getResource("fixtures/" + path).getFile());
     }

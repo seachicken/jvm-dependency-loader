@@ -13,9 +13,12 @@ public class Main {
         try (var resolver = new DependencyLoader()) {
             while (scanner.hasNextLine()) {
                 var input = mapper.readValue(scanner.nextLine(), Input.class);
-                var methods = resolver.readMethods(input.fqcn(), Path.of(input.from()));
+                var result = switch (input.type()) {
+                    case METHODS -> resolver.readMethods(input.fqcn(), Path.of(input.from()));
+                    case HIERARCHY -> resolver.readHierarchy(input.fqcn(), Path.of(input.from()));
+                };
                 try {
-                    var json = mapper.writeValueAsString(methods);
+                    var json = mapper.writeValueAsString(result);
                     System.out.println(json);
                 } catch (JsonProcessingException e) {
                     throw new IllegalArgumentException(e);
