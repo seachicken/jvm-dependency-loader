@@ -1,6 +1,6 @@
 [submodule "src/test/resources/fixtures/spring-tutorials"]
 	path = src/test/resources/fixtures/spring-tutorials
 	url = git@github.com:seachicken/tutorials.git
-[submodule "src/test/resources/fixture/spring-boot-realworld-example-app"]
-	path = src/test/resources/fixture/spring-boot-realworld-example-app
+[submodule "src/test/resources/fixtures/spring-boot-realworld-example-app"]
+	path = src/test/resources/fixtures/spring-boot-realworld-example-app
 	url = git@github.com:seachicken/spring-boot-realworld-example-app.git
