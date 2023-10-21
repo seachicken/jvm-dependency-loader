@@ -1,10 +1,8 @@
 package inga.jvmdependencyloader;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import inga.jvmdependencyloader.buildtool.BuildTool;
+
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -70,8 +68,7 @@ public class DependencyLoader implements AutoCloseable {
         if (classLoaders.containsKey(baseDir)) {
             classLoader = classLoaders.get(baseDir);
         } else {
-            copyDependencies(baseDir);
-            classLoader = new URLClassLoader(findJarUrls(baseDir.resolve("target/dependency")));
+            classLoader = BuildTool.create(baseDir).load(baseDir);
             classLoaders.put(baseDir, classLoader);
         }
         return classLoader;
@@ -82,33 +79,5 @@ public class DependencyLoader implements AutoCloseable {
         for (var loader : classLoaders.values()) {
             loader.close();
         }
-    }
-
-    private void copyDependencies(Path path) {
-        try {
-            var process = new ProcessBuilder("mvn", "dependency:copy-dependencies", "-q")
-                .directory(path.toFile())
-                .start();
-            process.waitFor();
-        } catch (IOException | InterruptedException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    private URL[] findJarUrls(Path dependencyDir) {
-        if (!Files.exists(dependencyDir)) {
-            return new URL[]{};
-        }
-        var results = new ArrayList<URL>();
-        for (var file : dependencyDir.toFile().listFiles()) {
-            if (file.isFile() && file.getName().endsWith(".jar")) {
-                try {
-                    results.add(file.toURI().toURL());
-                } catch (MalformedURLException e) {
-                    throw new IllegalArgumentException(e);
-                }
-            }
-        }
-        return results.toArray(URL[]::new);
     }
 }

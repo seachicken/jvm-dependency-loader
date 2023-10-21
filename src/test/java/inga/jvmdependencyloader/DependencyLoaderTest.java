@@ -22,7 +22,7 @@ class DependencyLoaderTest {
     }
 
     @Test
-    void readMethods() {
+    void readMethodsForMaven() {
         var actual = loader.readMethods(
                 "org.springframework.web.util.UriComponentsBuilder",
                 getFixturesPath("spring-tutorials/lightrun/api-service")
@@ -31,10 +31,31 @@ class DependencyLoaderTest {
     }
 
     @Test
-    void readHierarchy() {
+    void readMethodsForGradle() {
+        var actual = loader.readMethods(
+                "org.joda.time.DateTime",
+                getFixturesPath("spring-boot-realworld-example-app")
+        );
+        assertThat(actual).size().isEqualTo(89);
+    }
+
+    @Test
+    void readHierarchyForMaven() {
         var actual = loader.readHierarchy(
                 "java.lang.String",
                 getFixturesPath("spring-tutorials/lightrun/api-service")
+        );
+        assertThat(actual).containsExactly(
+                new Type("java.lang.Object", false),
+                new Type("java.lang.String", false)
+        );
+    }
+
+    @Test
+    void readHierarchyForGradle() {
+        var actual = loader.readHierarchy(
+                "java.lang.String",
+                getFixturesPath("spring-boot-realworld-example-app")
         );
         assertThat(actual).containsExactly(
                 new Type("java.lang.Object", false),
