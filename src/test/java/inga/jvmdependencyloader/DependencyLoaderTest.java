@@ -76,7 +76,7 @@ class DependencyLoaderTest {
 
         @Test
         void readMethodsWithCompiledClass() throws Exception {
-            compile(getFixturesPath("spring-tutorials/lightrun/api-service"));
+            compile(getFixturesPath("spring-tutorials/lightrun"));
             var actual = loader.readMethods(
                     "com.baeldung.apiservice.adapters.tasks.Task",
                     getFixturesPath("spring-tutorials/lightrun/api-service")
