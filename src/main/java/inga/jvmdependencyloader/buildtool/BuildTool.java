@@ -9,7 +9,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 public interface BuildTool {
-    URLClassLoader load(Path root);
+    URLClassLoader load();
+    Path findCompiledClassPath();
 
     static BuildTool create(Path root) {
         try (var stream = Files.walk(root)) {
@@ -18,9 +19,9 @@ public interface BuildTool {
                     .map(p -> p.getFileName().toString())
                     .toList();
             if (fileNames.contains("pom.xml")) {
-                return new Maven();
+                return new Maven(root);
             } else if (fileNames.contains("build.gradle")) {
-                return new Gradle();
+                return new Gradle(root);
             }
             throw new IllegalArgumentException("no build tool found");
         } catch (IOException e) {
@@ -29,19 +30,29 @@ public interface BuildTool {
     }
 
     default URL[] findJarUrls(Path dependencyDir) {
-        if (!Files.exists(dependencyDir)) {
-            return new URL[]{};
-        }
         var results = new ArrayList<URL>();
-        for (var file : dependencyDir.toFile().listFiles()) {
-            if (file.isFile() && file.getName().endsWith(".jar")) {
-                try {
-                    results.add(file.toURI().toURL());
-                } catch (MalformedURLException e) {
-                    throw new IllegalArgumentException(e);
+
+        var classPath = findCompiledClassPath();
+        if (Files.exists(classPath)) {
+            try {
+                results.add(classPath.toFile().toURI().toURL());
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+
+        if (Files.exists(dependencyDir)) {
+            for (var file : dependencyDir.toFile().listFiles()) {
+                if (file.isFile() && file.getName().endsWith(".jar")) {
+                    try {
+                        results.add(file.toURI().toURL());
+                    } catch (MalformedURLException e) {
+                        throw new IllegalArgumentException(e);
+                    }
                 }
             }
         }
+
         return results.toArray(URL[]::new);
     }
 }

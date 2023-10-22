@@ -7,16 +7,27 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 public class Gradle implements BuildTool {
+    private final Path root;
+
+    public Gradle(Path root) {
+        this.root = root;
+    }
+
     @Override
-    public URLClassLoader load(Path root) {
-        backupBuildGradle(root);
-        copyDependencies(root);
+    public URLClassLoader load() {
+        backupBuildGradle();
+        copyDependencies();
         var classLoader = new URLClassLoader(findJarUrls(root.resolve("target/dependency")));
-        restoreBuildGradle(root);
+        restoreBuildGradle();
         return classLoader;
     }
 
-    private void copyDependencies(Path root) {
+    @Override
+    public Path findCompiledClassPath() {
+        return root.resolve("build/classes/java/main");
+    }
+
+    private void copyDependencies() {
         var gradleStream = getClass().getClassLoader().getResourceAsStream("ingaCopyDependencies.gradle");
         try {
             Files.copy(gradleStream, root.resolve("ingaCopyDependencies.gradle"), StandardCopyOption.REPLACE_EXISTING);
@@ -31,7 +42,7 @@ public class Gradle implements BuildTool {
         }
     }
 
-    private void backupBuildGradle(Path root) {
+    private void backupBuildGradle() {
         try {
             var process = new ProcessBuilder("bash", "-c",
                     "cp build.gradle build.gradle.org")
@@ -43,7 +54,7 @@ public class Gradle implements BuildTool {
         }
     }
 
-    private void restoreBuildGradle(Path root) {
+    private void restoreBuildGradle() {
         try {
             var process = new ProcessBuilder("bash", "-c",
                     "mv build.gradle.org build.gradle && rm ingaCopyDependencies.gradle")

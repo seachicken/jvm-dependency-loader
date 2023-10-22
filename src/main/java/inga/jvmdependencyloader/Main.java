@@ -1,6 +1,5 @@
 package inga.jvmdependencyloader;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.nio.file.Path;
@@ -17,12 +16,8 @@ public class Main {
                     case METHODS -> resolver.readMethods(input.fqcn(), Path.of(input.from()));
                     case HIERARCHY -> resolver.readHierarchy(input.fqcn(), Path.of(input.from()));
                 };
-                try {
-                    var json = mapper.writeValueAsString(result);
-                    System.out.println(json);
-                } catch (JsonProcessingException e) {
-                    throw new IllegalArgumentException(e);
-                }
+                var json = mapper.writeValueAsString(result);
+                System.out.println(json);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -27,7 +27,8 @@ public class DependencyLoader implements AutoCloseable {
                             new Type(m.getReturnType().getName(), m.getReturnType().isInterface())
                     ))
                     .collect(Collectors.toList());
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+            e.printStackTrace(System.err);
             return Collections.emptyList();
         }
     }
@@ -68,7 +69,7 @@ public class DependencyLoader implements AutoCloseable {
         if (classLoaders.containsKey(baseDir)) {
             classLoader = classLoaders.get(baseDir);
         } else {
-            classLoader = BuildTool.create(baseDir).load(baseDir);
+            classLoader = BuildTool.create(baseDir).load();
             classLoaders.put(baseDir, classLoader);
         }
         return classLoader;
