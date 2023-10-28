@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,11 +45,21 @@ class DependencyLoaderTest {
         }
 
         @Test
+        void convertToDotSeparatedForInnerEnum() throws Exception {
+            compile(getFixturesPath("spring-boot-realworld-example-app"));
+            var actual = loader.readMethods(
+                    "io.spring.application.CursorPageParameter",
+                    getFixturesPath("spring-boot-realworld-example-app")
+            ).stream().filter(m -> m.name().equals("getDirection")).findFirst().get();
+            assertThat(actual.returnType().name()).isEqualTo("io.spring.application.CursorPager.Direction");
+        }
+
+        @Test
         void readHierarchy() {
             var actual = loader.readHierarchy(
                     "java.lang.String",
                     getFixturesPath("spring-boot-realworld-example-app")
-            );
+            ).stream().filter(t -> !t.isInterface()).collect(Collectors.toList());
             assertThat(actual).containsExactly(
                     new Type("java.lang.Object", false),
                     new Type("java.lang.String", false)
@@ -89,7 +100,7 @@ class DependencyLoaderTest {
             var actual = loader.readHierarchy(
                     "java.lang.String",
                     getFixturesPath("spring-tutorials/lightrun/api-service")
-            );
+            ).stream().filter(t -> !t.isInterface()).collect(Collectors.toList());
             assertThat(actual).containsExactly(
                     new Type("java.lang.Object", false),
                     new Type("java.lang.String", false)

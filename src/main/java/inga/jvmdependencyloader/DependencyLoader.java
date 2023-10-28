@@ -22,9 +22,9 @@ public class DependencyLoader implements AutoCloseable {
                     .map(m -> new Method(
                             m.getName(),
                             Arrays.stream(m.getParameterTypes())
-                                    .map(t -> new Type(t.getName(), t.isInterface()))
+                                    .map(t -> new Type(t, t.isInterface()))
                                     .collect(Collectors.toList()),
-                            new Type(m.getReturnType().getName(), m.getReturnType().isInterface())
+                            new Type(m.getReturnType(), m.getReturnType().isInterface())
                     ))
                     .collect(Collectors.toList());
         } catch (ClassNotFoundException | NoClassDefFoundError e) {
@@ -40,11 +40,22 @@ public class DependencyLoader implements AutoCloseable {
         }
 
         try {
-            var clazz = classLoader.loadClass(fqcn);
             var results = new ArrayList<Type>();
-            while (clazz != null) {
+            var stack = new Stack<Class<?>>();
+            stack.push(classLoader.loadClass(fqcn));
+            while (!stack.isEmpty()) {
+                var clazz = stack.pop();
                 results.add(new Type(clazz.getName(), clazz.isInterface()));
-                clazz = clazz.getSuperclass();
+                var parents = new ArrayList<>(List.of(clazz.getInterfaces()));
+                if (clazz.getSuperclass() != null) {
+                    parents.add(clazz.getSuperclass());
+                }
+                for (var parent : parents) {
+                    if (results.stream().noneMatch(t -> t.name().equals(parent.getName()))
+                            && !stack.contains(parent)) {
+                        stack.push(parent);
+                    }
+                }
             }
             Collections.reverse(results);
             return results;
