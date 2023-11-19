@@ -31,7 +31,7 @@ class DependencyLoaderTest {
                     "org.joda.time.DateTime",
                     getFixturesPath("spring-boot-realworld-example-app")
             );
-            assertThat(actual).size().isEqualTo(89);
+            assertThat(actual).size().isEqualTo(144);
         }
 
         @Test
@@ -41,7 +41,7 @@ class DependencyLoaderTest {
                     "io.spring.core.article.Article",
                     getFixturesPath("spring-boot-realworld-example-app")
             );
-            assertThat(actual).size().isEqualTo(14);
+            assertThat(actual).size().isEqualTo(20);
         }
 
         @Test
@@ -92,7 +92,7 @@ class DependencyLoaderTest {
                     "com.baeldung.apiservice.adapters.tasks.Task",
                     getFixturesPath("spring-tutorials/lightrun/api-service")
             );
-            assertThat(actual).size().isEqualTo(9);
+            assertThat(actual).size().isEqualTo(15);
         }
 
         @Test

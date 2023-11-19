@@ -17,7 +17,7 @@ public class DependencyLoader implements AutoCloseable {
         }
 
         try {
-            var methods = classLoader.loadClass(fqcn).getDeclaredMethods();
+            var methods = classLoader.loadClass(fqcn).getMethods();
             return Arrays.stream(methods)
                     .map(m -> new Method(
                             m.getName(),
@@ -65,23 +65,15 @@ public class DependencyLoader implements AutoCloseable {
     }
 
     private URLClassLoader loadClassLoader(Path from) {
-        var baseDir = classLoaders.keySet()
-                .stream()
-                .filter(p -> p.toString().startsWith(p.toString()))
-                .findFirst()
-                .orElse(null);
-        if (baseDir == null) {
-            baseDir = from;
-        }
-        if (baseDir == null) {
+        if (from == null) {
             return null;
         }
         URLClassLoader classLoader;
-        if (classLoaders.containsKey(baseDir)) {
-            classLoader = classLoaders.get(baseDir);
+        if (classLoaders.containsKey(from)) {
+            classLoader = classLoaders.get(from);
         } else {
-            classLoader = BuildTool.create(baseDir).load();
-            classLoaders.put(baseDir, classLoader);
+            classLoader = BuildTool.create(from).load();
+            classLoaders.put(from, classLoader);
         }
         return classLoader;
     }
