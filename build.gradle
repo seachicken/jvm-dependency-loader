@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'inga.jvmdependencyloader'
-version = '0.3.4-pre4'
+version = '0.3.4-pre5'
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE

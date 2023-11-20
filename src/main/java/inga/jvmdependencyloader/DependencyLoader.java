@@ -68,7 +68,7 @@ public class DependencyLoader implements AutoCloseable {
     }
 
     private URLClassLoader loadClassLoader(Path from) {
-        System.err.println("loadClassLoader. from: " + from + " classLoaders: " + classLoaders.size());
+        System.err.println("loadClassLoader. from: " + from + " classLoaders: " + classLoaders);
         if (from == null) {
             return null;
         }
@@ -81,7 +81,7 @@ public class DependencyLoader implements AutoCloseable {
             classLoader = BuildTool.create(from).load();
             classLoaders.put(from, classLoader);
         }
-        System.err.println(" get loader: " + classLoader);
+        System.err.println(" get loader: " + classLoader + " classLoaders: " + classLoaders);
         return classLoader;
     }
 
