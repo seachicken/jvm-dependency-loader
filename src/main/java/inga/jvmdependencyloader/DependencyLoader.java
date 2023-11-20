@@ -65,15 +65,20 @@ public class DependencyLoader implements AutoCloseable {
     }
 
     private URLClassLoader loadClassLoader(Path from) {
-        if (from == null) {
+        var baseDir = classLoaders.keySet()
+                .stream()
+                .filter(p -> p.toString().startsWith(p.toString()))
+                .findFirst()
+                .orElse(from);
+        if (baseDir == null) {
             return null;
         }
         URLClassLoader classLoader;
-        if (classLoaders.containsKey(from)) {
-            classLoader = classLoaders.get(from);
+        if (classLoaders.containsKey(baseDir)) {
+            classLoader = classLoaders.get(baseDir);
         } else {
-            classLoader = BuildTool.create(from).load();
-            classLoaders.put(from, classLoader);
+            classLoader = BuildTool.create(baseDir).load();
+            classLoaders.put(baseDir, classLoader);
         }
         return classLoader;
     }
