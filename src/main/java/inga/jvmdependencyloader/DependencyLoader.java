@@ -13,6 +13,7 @@ public class DependencyLoader implements AutoCloseable {
     public List<Method> readMethods(String fqcn, Path from) {
         URLClassLoader classLoader = loadClassLoader(from);
         if (classLoader == null) {
+            System.err.println("classLoader is not found. from: " + from);
             return Collections.emptyList();
         }
 
@@ -36,6 +37,7 @@ public class DependencyLoader implements AutoCloseable {
     public List<Type> readHierarchy(String fqcn, Path from) {
         URLClassLoader classLoader = loadClassLoader(from);
         if (classLoader == null) {
+            System.err.println("classLoader is not found. from: " + from);
             return Collections.emptyList();
         }
 
@@ -60,6 +62,7 @@ public class DependencyLoader implements AutoCloseable {
             Collections.reverse(results);
             return results;
         } catch (ClassNotFoundException e) {
+            e.printStackTrace(System.err);
             return Collections.emptyList();
         }
     }
