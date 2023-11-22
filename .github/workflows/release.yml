@@ -25,9 +25,9 @@ jobs:
       with:
         arguments: assemble
     - name: Upload to GitHub Releases
-      if: !contains(github.ref_name, 'pre')
+      if: "!contains(github.ref_name, 'pre')"
       run: gh release create --title ${{ github.ref_name }} --generate-notes ${{ github.ref_name }} ./build/libs/jvm-dependency-loader-${{ github.ref_name##*/ }}.jar
     - name: Upload to GitHub Releases for pre-release
-      if: contains(github.ref_name, 'pre')
+      if: "contains(github.ref_name, 'pre')"
       run: gh release create --title ${{ github.ref_name }} --generate-notes --draft ${{ github.ref_name }} ./build/libs/jvm-dependency-loader-${{ github.ref_name##*/ }}.jar
 
