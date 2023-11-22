@@ -3,13 +3,12 @@ name: Release
 on:
   push:
     tags:
-      - "jvm-dependency-loader-*"
+      - "v*"
 permissions:
   contents: write
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -21,12 +20,14 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
         arguments: assemble
-
     - name: Upload to GitHub Releases
-      run: gh release create --title ${{ github.ref_name }} --generate-notes ${{ github.ref_name }} ./build/libs/${{ github.ref_name }}.jar
+      if: !contains(github.ref_name, 'pre')
+      run: gh release create --title ${{ github.ref_name }} --generate-notes ${{ github.ref_name }} ./build/libs/jvm-dependency-loader-${{ github.ref_name##*/ }}.jar
+    - name: Upload to GitHub Releases
+      if: contains(github.ref_name, 'pre')
+      run: gh release create --title ${{ github.ref_name }} --generate-notes --draft ${{ github.ref_name }} ./build/libs/jvm-dependency-loader-${{ github.ref_name##*/ }}.jar
 
