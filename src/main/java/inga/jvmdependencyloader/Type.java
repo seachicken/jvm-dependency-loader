@@ -5,6 +5,6 @@ public record Type(
         boolean isInterface
 ) {
     public Type(Class clazz, boolean isInterface) {
-        this(clazz.getCanonicalName(), isInterface);
+        this(clazz.getName(), isInterface);
     }
 }
