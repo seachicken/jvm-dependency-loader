@@ -61,7 +61,7 @@ public class DependencyLoader implements AutoCloseable {
             }
             Collections.reverse(results);
             return results;
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
             e.printStackTrace(System.err);
             return Collections.emptyList();
         }
