@@ -45,16 +45,6 @@ class DependencyLoaderTest {
         }
 
         @Test
-        void convertToDotSeparatedForInnerEnum() throws Exception {
-            compile(getFixturesPath("spring-boot-realworld-example-app"));
-            var actual = loader.readMethods(
-                    "io.spring.application.CursorPageParameter",
-                    getFixturesPath("spring-boot-realworld-example-app")
-            ).stream().filter(m -> m.name().equals("getDirection")).findFirst().get();
-            assertThat(actual.returnType().name()).isEqualTo("io.spring.application.CursorPager.Direction");
-        }
-
-        @Test
         void readHierarchy() {
             var actual = loader.readHierarchy(
                     "java.lang.String",

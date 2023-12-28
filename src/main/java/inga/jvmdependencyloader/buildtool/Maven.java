@@ -1,8 +1,14 @@
 package inga.jvmdependencyloader.buildtool;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Maven implements BuildTool {
     private final Path root;
@@ -13,8 +19,16 @@ public class Maven implements BuildTool {
 
     @Override
     public URLClassLoader load() {
-        copyDependencies();
-        return new URLClassLoader(findJarUrls(root.resolve("target/dependency")));
+        var jarUrls = getJarUrls();
+        var classPath = findCompiledClassPath();
+        if (Files.exists(classPath)) {
+            try {
+                jarUrls.add(classPath.toFile().toURI().toURL());
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+        return new URLClassLoader(jarUrls.toArray(URL[]::new));
     }
 
     @Override
@@ -22,12 +36,24 @@ public class Maven implements BuildTool {
         return root.resolve("target/classes");
     }
 
-    private void copyDependencies() {
+    private List<URL> getJarUrls() {
         try {
-            var process = new ProcessBuilder("mvn", "dependency:copy-dependencies", "-q")
+            var process = new ProcessBuilder(
+                    "mvn",
+                    "dependency:build-classpath",
+                    "-DincludeScope=compile",
+                    "-Dmdep.outputFile=/dev/stdout",
+                    "-q")
                     .directory(root.toFile())
                     .start();
             process.waitFor();
+            try (var reader = process.inputReader()) {
+                var results = new ArrayList<URL>();
+                for (var path : reader.lines().flatMap(l -> Arrays.stream(l.split(":"))).toList()) {
+                    results.add(Path.of(path).toUri().toURL());
+                }
+                return results;
+            }
         } catch (IOException | InterruptedException e) {
             throw new IllegalArgumentException(e);
         }
