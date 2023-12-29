@@ -51,8 +51,8 @@ class DependencyLoaderTest {
                     getFixturesPath("spring-boot-realworld-example-app")
             ).stream().filter(t -> !t.isInterface()).collect(Collectors.toList());
             assertThat(actual).containsExactly(
-                    new Type("java.lang.Object", false),
-                    new Type("java.lang.String", false)
+                    new Type("java.lang.Object", false, false),
+                    new Type("java.lang.String", false, false)
             );
         }
 
@@ -86,14 +86,23 @@ class DependencyLoaderTest {
         }
 
         @Test
+        void readMethodsWithList() {
+            var actual = loader.readMethods(
+                    "java.lang.String",
+                    getFixturesPath("spring-tutorials/lightrun/api-service")
+            );
+            assertThat(actual).size().isEqualTo(90);
+        }
+
+        @Test
         void readHierarchy() {
             var actual = loader.readHierarchy(
                     "java.lang.String",
                     getFixturesPath("spring-tutorials/lightrun/api-service")
             ).stream().filter(t -> !t.isInterface()).collect(Collectors.toList());
             assertThat(actual).containsExactly(
-                    new Type("java.lang.Object", false),
-                    new Type("java.lang.String", false)
+                    new Type("java.lang.Object", false, false),
+                    new Type("java.lang.String", false, false)
             );
         }
 
