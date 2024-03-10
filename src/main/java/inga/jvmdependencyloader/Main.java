@@ -14,6 +14,7 @@ public class Main {
                 var input = mapper.readValue(scanner.nextLine(), Input.class);
                 var result = switch (input.type()) {
                     case METHODS -> resolver.readMethods(input.fqcn(), Path.of(input.from()));
+                    case CLASSES -> resolver.readClasses(input.fqcn(), Path.of(input.from()));
                     case HIERARCHY -> resolver.readHierarchy(input.fqcn(), Path.of(input.from()));
                 };
                 var json = mapper.writeValueAsString(result);

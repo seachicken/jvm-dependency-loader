@@ -34,6 +34,24 @@ public class DependencyLoader implements AutoCloseable {
         }
     }
 
+    public List<Clazz> readClasses(String fqcn, Path from) {
+        URLClassLoader classLoader = loadClassLoader(from);
+        if (classLoader == null) {
+            System.err.println("classLoader is not found. from: " + from);
+            return Collections.emptyList();
+        }
+
+        try {
+            var classes = classLoader.loadClass(fqcn).getDeclaredClasses();
+            return Arrays.stream(classes)
+                    .map(c -> new Clazz(c.getName()))
+                    .collect(Collectors.toList());
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+            e.printStackTrace(System.err);
+            return Collections.emptyList();
+        }
+    }
+
     public List<Type> readHierarchy(String fqcn, Path from) {
         URLClassLoader classLoader = loadClassLoader(from);
         if (classLoader == null) {

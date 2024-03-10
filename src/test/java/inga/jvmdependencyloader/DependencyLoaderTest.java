@@ -95,6 +95,20 @@ class DependencyLoaderTest {
         }
 
         @Test
+        void readClasses() {
+            var actual = loader.readClasses(
+                    "com.baeldung.classfile.Outer",
+                    getFixturesPath("spring-tutorials/core-java-modules/core-java-lang-oop-types")
+            );
+            assertThat(actual).map(Clazz::name).containsExactlyInAnyOrder(
+                    "com.baeldung.classfile.Outer$Color",
+                    "com.baeldung.classfile.Outer$HelloOuter",
+                    "com.baeldung.classfile.Outer$Nested",
+                    "com.baeldung.classfile.Outer$StaticNested"
+            );
+        }
+
+        @Test
         void readHierarchy() {
             var actual = loader.readHierarchy(
                     "java.lang.String",

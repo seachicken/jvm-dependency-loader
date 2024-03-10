@@ -7,6 +7,7 @@ public record Input(
 ) {
     public enum Type {
         METHODS,
+        CLASSES,
         HIERARCHY
     }
 }
