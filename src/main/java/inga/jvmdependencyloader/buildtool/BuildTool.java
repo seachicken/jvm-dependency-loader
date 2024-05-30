@@ -22,6 +22,8 @@ public interface BuildTool {
                 return new Maven(root);
             } else if (fileNames.contains("build.gradle")) {
                 return new Gradle(root);
+            } else if (fileNames.contains("build.gradle.kts")) {
+                return new Gradle(root);
             }
             throw new IllegalArgumentException("no build tool found");
         } catch (IOException e) {
