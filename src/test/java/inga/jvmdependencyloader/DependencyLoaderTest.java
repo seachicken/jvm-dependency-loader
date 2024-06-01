@@ -4,6 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnJre;
+import org.junit.jupiter.api.condition.JRE;
 
 import java.nio.file.Path;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ class DependencyLoaderTest {
     @Nested
     class Gradle {
         @Test
+        @EnabledOnJre(JRE.JAVA_17)
         void readMethodsWithDependencies() {
             var actual = loader.readMethods(
                     "org.joda.time.DateTime",
@@ -35,6 +38,7 @@ class DependencyLoaderTest {
         }
 
         @Test
+        @EnabledOnJre(JRE.JAVA_17)
         void readMethodsWithCompiledClass() throws Exception {
             compile(getFixturesPath("spring-boot-realworld-example-app"));
             var actual = loader.readMethods(
@@ -45,6 +49,7 @@ class DependencyLoaderTest {
         }
 
         @Test
+        @EnabledOnJre(JRE.JAVA_17)
         void readHierarchy() {
             var actual = loader.readHierarchy(
                     "java.lang.String",
