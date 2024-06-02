@@ -1,9 +1,6 @@
 package inga.jvmdependencyloader;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.api.condition.JRE;
 
@@ -40,7 +37,6 @@ class DependencyLoaderTest {
         @Test
         @EnabledOnJre(JRE.JAVA_17)
         void readMethodsWithCompiledClass() throws Exception {
-            compile(getFixturesPath("spring-boot-realworld-example-app"));
             var actual = loader.readMethods(
                     "io.spring.core.article.Article",
                     getFixturesPath("spring-boot-realworld-example-app")
@@ -60,13 +56,6 @@ class DependencyLoaderTest {
                     new Type("java.lang.String", false, false)
             );
         }
-
-        private void compile(Path root) throws Exception {
-            var process = new ProcessBuilder("./gradlew", "clean", "compileJava")
-                    .directory(root.toFile())
-                    .start();
-            process.waitFor();
-        }
     }
 
     @Nested
@@ -82,7 +71,6 @@ class DependencyLoaderTest {
 
         @Test
         void readMethodsWithCompiledClass() throws Exception {
-            compile(getFixturesPath("spring-tutorials/lightrun"));
             var actual = loader.readMethods(
                     "com.baeldung.apiservice.adapters.tasks.Task",
                     getFixturesPath("spring-tutorials/lightrun/api-service")
@@ -123,13 +111,6 @@ class DependencyLoaderTest {
                     new Type("java.lang.Object", false, false),
                     new Type("java.lang.String", false, false)
             );
-        }
-
-        private void compile(Path root) throws Exception {
-            var process = new ProcessBuilder("mvn", "clean", "compile")
-                    .directory(root.toFile())
-                    .start();
-            process.waitFor();
         }
     }
 
