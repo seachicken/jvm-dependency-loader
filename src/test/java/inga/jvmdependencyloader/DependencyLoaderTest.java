@@ -96,7 +96,7 @@ class DependencyLoaderTest {
                     "java.lang.String",
                     getFixturesPath("spring-tutorials/lightrun/api-service")
             );
-            assertThat(actual).size().isEqualTo(90);
+            assertThat(actual).size().isEqualTo(93);
         }
 
         @Test
