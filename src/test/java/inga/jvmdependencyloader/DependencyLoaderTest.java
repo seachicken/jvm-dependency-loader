@@ -1,10 +1,12 @@
 package inga.jvmdependencyloader;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.condition.EnabledOnJre;
-import org.junit.jupiter.api.condition.JRE;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +27,6 @@ class DependencyLoaderTest {
     @Nested
     class Gradle {
         @Test
-        @EnabledOnJre(JRE.JAVA_17)
         void readMethodsWithDependencies() {
             var actual = loader.readMethods(
                     "org.joda.time.DateTime",
@@ -35,8 +36,7 @@ class DependencyLoaderTest {
         }
 
         @Test
-        @EnabledOnJre(JRE.JAVA_17)
-        void readMethodsWithCompiledClass() throws Exception {
+        void readMethodsWithCompiledClass() {
             var actual = loader.readMethods(
                     "io.spring.core.article.Article",
                     getFixturesPath("spring-boot-realworld-example-app")
@@ -45,7 +45,6 @@ class DependencyLoaderTest {
         }
 
         @Test
-        @EnabledOnJre(JRE.JAVA_17)
         void readHierarchy() {
             var actual = loader.readHierarchy(
                     "java.lang.String",
@@ -70,7 +69,7 @@ class DependencyLoaderTest {
         }
 
         @Test
-        void readMethodsWithCompiledClass() throws Exception {
+        void readMethodsWithCompiledClass() {
             var actual = loader.readMethods(
                     "com.baeldung.apiservice.adapters.tasks.Task",
                     getFixturesPath("spring-tutorials/lightrun/api-service")
@@ -115,6 +114,6 @@ class DependencyLoaderTest {
     }
 
     private Path getFixturesPath(String path) {
-        return Path.of(getClass().getClassLoader().getResource("fixtures/" + path).getFile());
+        return Paths.get("src","test","resources", "fixtures", path).toAbsolutePath();
     }
 }
