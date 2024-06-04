@@ -5,8 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +28,7 @@ class DependencyLoaderTest {
         void readMethodsWithDependencies() {
             var actual = loader.readMethods(
                     "org.joda.time.DateTime",
-                    getFixturesPath("spring-boot-realworld-example-app")
+                    TestHelper.getFixturesPath("spring-boot-realworld-example-app")
             );
             assertThat(actual).size().isEqualTo(144);
         }
@@ -39,7 +37,7 @@ class DependencyLoaderTest {
         void readMethodsWithCompiledClass() {
             var actual = loader.readMethods(
                     "io.spring.core.article.Article",
-                    getFixturesPath("spring-boot-realworld-example-app")
+                    TestHelper.getFixturesPath("spring-boot-realworld-example-app")
             );
             assertThat(actual).size().isEqualTo(20);
         }
@@ -48,7 +46,7 @@ class DependencyLoaderTest {
         void readHierarchy() {
             var actual = loader.readHierarchy(
                     "java.lang.String",
-                    getFixturesPath("spring-boot-realworld-example-app")
+                    TestHelper.getFixturesPath("spring-boot-realworld-example-app")
             ).stream().filter(t -> !t.isInterface()).collect(Collectors.toList());
             assertThat(actual).containsExactly(
                     new Type("java.lang.Object", false, false),
@@ -63,7 +61,7 @@ class DependencyLoaderTest {
         void readMethodsWithDependencies() {
             var actual = loader.readMethods(
                     "org.springframework.web.util.UriComponentsBuilder",
-                    getFixturesPath("spring-tutorials/lightrun/api-service")
+                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
             );
             assertThat(actual).size().isEqualTo(68);
         }
@@ -72,7 +70,7 @@ class DependencyLoaderTest {
         void readMethodsWithCompiledClass() {
             var actual = loader.readMethods(
                     "com.baeldung.apiservice.adapters.tasks.Task",
-                    getFixturesPath("spring-tutorials/lightrun/api-service")
+                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
             );
             assertThat(actual).size().isEqualTo(15);
         }
@@ -81,7 +79,7 @@ class DependencyLoaderTest {
         void readMethodsWithList() {
             var actual = loader.readMethods(
                     "java.lang.String",
-                    getFixturesPath("spring-tutorials/lightrun/api-service")
+                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
             );
             assertThat(actual).size().isEqualTo(93);
         }
@@ -90,7 +88,7 @@ class DependencyLoaderTest {
         void readClasses() {
             var actual = loader.readClasses(
                     "com.baeldung.classfile.Outer",
-                    getFixturesPath("spring-tutorials/core-java-modules/core-java-lang-oop-types")
+                    TestHelper.getFixturesPath("spring-tutorials/core-java-modules/core-java-lang-oop-types")
             );
             assertThat(actual).map(Clazz::name).containsExactlyInAnyOrder(
                     "com.baeldung.classfile.Outer$Color",
@@ -104,16 +102,12 @@ class DependencyLoaderTest {
         void readHierarchy() {
             var actual = loader.readHierarchy(
                     "java.lang.String",
-                    getFixturesPath("spring-tutorials/lightrun/api-service")
+                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
             ).stream().filter(t -> !t.isInterface()).collect(Collectors.toList());
             assertThat(actual).containsExactly(
                     new Type("java.lang.Object", false, false),
                     new Type("java.lang.String", false, false)
             );
         }
-    }
-
-    private Path getFixturesPath(String path) {
-        return Paths.get("src","test","resources", "fixtures", path).toAbsolutePath();
     }
 }
