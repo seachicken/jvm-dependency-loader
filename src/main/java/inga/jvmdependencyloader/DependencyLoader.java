@@ -23,7 +23,7 @@ public class DependencyLoader implements AutoCloseable {
                     .map(m -> new Method(
                             m.getName(),
                             Arrays.stream(m.getParameterTypes())
-                                    .map(t -> new Type(t))
+                                    .map(Type::new)
                                     .collect(Collectors.toList()),
                             new Type(m.getReturnType())
                     ))
