@@ -20,7 +20,6 @@ public class DependencyLoader implements AutoCloseable {
         try {
             var methods = classLoader.loadClass(fqcn).getMethods();
             return Arrays.stream(methods)
-                    .filter(m -> !m.getReturnType().isInterface())
                     .map(m -> new Method(
                             m.getName(),
                             Arrays.stream(m.getParameterTypes())
@@ -28,7 +27,12 @@ public class DependencyLoader implements AutoCloseable {
                                     .collect(Collectors.toList()),
                             new Type(m.getReturnType())
                     ))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toMap(
+                            (m) -> m.name() + m.parameterTypes(),
+                            (m) -> m,
+                            (a, b) -> a.returnType().isInterface() ? b : a
+                    ))
+                    .values().stream().toList();
         } catch (ClassNotFoundException | NoClassDefFoundError e) {
             e.printStackTrace(System.err);
             return Collections.emptyList();
