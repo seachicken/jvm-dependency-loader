@@ -39,7 +39,7 @@ class DependencyLoaderTest {
                     "io.spring.core.article.Article",
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app")
             );
-            assertThat(actual).size().isEqualTo(20);
+            assertThat(actual).size().isEqualTo(19);
         }
 
         @Test
@@ -63,7 +63,7 @@ class DependencyLoaderTest {
                     "org.springframework.web.util.UriComponentsBuilder",
                     TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
             );
-            assertThat(actual).size().isEqualTo(68);
+            assertThat(actual).size().isEqualTo(50);
         }
 
         @Test
@@ -81,7 +81,7 @@ class DependencyLoaderTest {
                     "java.lang.String",
                     TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
             );
-            assertThat(actual).size().isEqualTo(93);
+            assertThat(actual).size().isEqualTo(89);
         }
 
         @Test
