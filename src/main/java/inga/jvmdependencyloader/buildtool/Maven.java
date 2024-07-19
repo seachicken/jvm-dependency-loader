@@ -20,6 +20,7 @@ public class Maven implements BuildTool {
     @Override
     public URLClassLoader load() {
         var jarUrls = getJarUrls();
+        System.err.println("jarUrls: " + jarUrls + ", root: " + root);
         var classPath = findCompiledClassPath();
         if (Files.exists(classPath)) {
             try {
