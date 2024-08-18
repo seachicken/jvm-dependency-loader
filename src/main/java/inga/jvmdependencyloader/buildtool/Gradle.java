@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -47,6 +48,10 @@ public class Gradle implements BuildTool {
     }
 
     private List<Artifact> findArtifacts() {
+        if (!Files.exists(root.resolve("gradlew"))) {
+            System.err.println("gradlew is not found in " + root);
+            return Collections.emptyList();
+        }
         try {
             var process = new ProcessBuilder(
                     "./gradlew", "-q", "dependencies", "--configuration", "compileClasspath")
