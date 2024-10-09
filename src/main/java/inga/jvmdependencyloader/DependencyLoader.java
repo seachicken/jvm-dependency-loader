@@ -2,6 +2,7 @@ package inga.jvmdependencyloader;
 
 import inga.jvmdependencyloader.buildtool.BuildTool;
 
+import java.io.IOException;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.*;
@@ -11,13 +12,12 @@ public class DependencyLoader implements AutoCloseable {
     private final Map<Path, URLClassLoader> classLoaders = new HashMap<>();
 
     public List<Method> readMethods(String fqcn, Path from) {
-        URLClassLoader classLoader = loadClassLoader(from);
-        if (classLoader == null) {
-            System.err.println("classLoader is not found. from: " + from);
-            return Collections.emptyList();
-        }
+        try (URLClassLoader classLoader = loadClassLoader(from)) {
+            if (classLoader == null) {
+                System.err.println("classLoader is not found. from: " + from);
+                return Collections.emptyList();
+            }
 
-        try {
             var methods = classLoader.loadClass(fqcn).getMethods();
             return Arrays.stream(methods)
                     .map(Method::new)
@@ -27,38 +27,36 @@ public class DependencyLoader implements AutoCloseable {
                             (a, b) -> a.returnType().isInterface() ? b : a
                     ))
                     .values().stream().toList();
-        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError | IOException e) {
             e.printStackTrace(System.err);
             return Collections.emptyList();
         }
     }
 
     public List<Clazz> readClasses(String fqcn, Path from) {
-        URLClassLoader classLoader = loadClassLoader(from);
-        if (classLoader == null) {
-            System.err.println("classLoader is not found. from: " + from);
-            return Collections.emptyList();
-        }
+        try (URLClassLoader classLoader = loadClassLoader(from)) {
+            if (classLoader == null) {
+                System.err.println("classLoader is not found. from: " + from);
+                return Collections.emptyList();
+            }
 
-        try {
             var classes = classLoader.loadClass(fqcn).getDeclaredClasses();
             return Arrays.stream(classes)
                     .map(c -> new Clazz(c.getName()))
                     .collect(Collectors.toList());
-        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError | IOException e) {
             e.printStackTrace(System.err);
             return Collections.emptyList();
         }
     }
 
     public List<Type> readHierarchy(String fqcn, Path from) {
-        URLClassLoader classLoader = loadClassLoader(from);
-        if (classLoader == null) {
-            System.err.println("classLoader is not found. from: " + from);
-            return Collections.emptyList();
-        }
+        try (URLClassLoader classLoader = loadClassLoader(from)) {
+            if (classLoader == null) {
+                System.err.println("classLoader is not found. from: " + from);
+                return Collections.emptyList();
+            }
 
-        try {
             var results = new ArrayList<Type>();
             var stack = new Stack<Class<?>>();
             stack.push(classLoader.loadClass(fqcn));
@@ -78,7 +76,7 @@ public class DependencyLoader implements AutoCloseable {
             }
             Collections.reverse(results);
             return results;
-        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError | IOException e) {
             e.printStackTrace(System.err);
             return Collections.emptyList();
         }
