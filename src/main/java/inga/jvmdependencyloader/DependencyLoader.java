@@ -3,6 +3,8 @@ package inga.jvmdependencyloader;
 import inga.jvmdependencyloader.buildtool.BuildTool;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.*;
@@ -93,6 +95,22 @@ public class DependencyLoader implements AutoCloseable {
             classLoader = BuildTool.create(from).load();
             classLoaders.put(from, classLoader);
         }
+
+        // recreate the URLClassLoader because compilation path may be added dynamically
+        var urls = new HashSet<>(List.of(classLoader.getURLs()));
+        try {
+            urls.add(BuildTool.create(from).findCompiledClassPath().toFile().toURI().toURL());
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(e);
+        }
+        try {
+            classLoader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        classLoader = new URLClassLoader(urls.toArray(URL[]::new));
+        classLoaders.put(from, classLoader);
+
         return classLoader;
     }
 
