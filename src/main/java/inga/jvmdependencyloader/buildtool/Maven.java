@@ -1,10 +1,7 @@
 package inga.jvmdependencyloader.buildtool;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Files;
+import java.net.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,16 +16,7 @@ public class Maven implements BuildTool {
 
     @Override
     public URLClassLoader load() {
-        var jarUrls = getJarUrls();
-        var classPath = findCompiledClassPath();
-        if (Files.exists(classPath)) {
-            try {
-                jarUrls.add(classPath.toFile().toURI().toURL());
-            } catch (MalformedURLException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-        return new URLClassLoader(jarUrls.toArray(URL[]::new));
+        return new URLClassLoader(getJarUrls().toArray(URL[]::new));
     }
 
     @Override

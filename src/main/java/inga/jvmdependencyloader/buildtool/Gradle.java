@@ -4,7 +4,6 @@ import inga.jvmdependencyloader.Artifact;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.*;
@@ -13,7 +12,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class Gradle implements BuildTool {
     private final Path gradleHome;
@@ -27,19 +25,10 @@ public class Gradle implements BuildTool {
 
     @Override
     public URLClassLoader load() {
-        var jarUrls = findArtifacts().stream()
+        return new URLClassLoader(findArtifacts().stream()
                 .map(this::findJarUrl)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        var classPath = findCompiledClassPath();
-        if (Files.exists(classPath)) {
-            try {
-                jarUrls.add(classPath.toFile().toURI().toURL());
-            } catch (MalformedURLException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-        return new URLClassLoader(jarUrls.toArray(URL[]::new));
+                .toArray(URL[]::new));
     }
 
     @Override
