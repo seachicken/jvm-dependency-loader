@@ -13,7 +13,7 @@ public interface BuildTool {
     static BuildTool create(Path root) {
         try (var stream = Files.walk(root)) {
             var fileNames = stream
-                    .filter(p -> p.toFile().isFile())
+                    .filter(p -> !Files.isSymbolicLink(p) && p.toFile().isFile())
                     .map(p -> p.getFileName().toString())
                     .toList();
             if (fileNames.contains("pom.xml")) {
