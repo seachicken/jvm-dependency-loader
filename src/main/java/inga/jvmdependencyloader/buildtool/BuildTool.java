@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public interface BuildTool {
     URLClassLoader load();
-    Path findCompiledClassPath();
+    List<Path> findCompiledClassPaths();
 
     static BuildTool create(Path root) {
         try (var stream = Files.walk(root)) {
