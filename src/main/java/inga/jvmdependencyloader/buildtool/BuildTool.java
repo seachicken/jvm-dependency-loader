@@ -11,9 +11,9 @@ public interface BuildTool {
     List<Path> findCompiledClassPaths();
 
     static BuildTool create(Path root) {
-        try (var stream = Files.walk(root)) {
+        try (var stream = Files.list(root)) {
             var fileNames = stream
-                    .filter(p -> !Files.isSymbolicLink(p) && p.toFile().isFile())
+                    .filter(p -> p.toFile().isFile())
                     .map(p -> p.getFileName().toString())
                     .toList();
             if (fileNames.contains("pom.xml")) {
