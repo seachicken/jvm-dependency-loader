@@ -20,8 +20,8 @@ public class Maven implements BuildTool {
     }
 
     @Override
-    public Path findCompiledClassPath() {
-        return root.resolve("target/classes");
+    public List<Path> findCompiledClassPaths() {
+        return List.of(root.resolve("target/classes"));
     }
 
     private List<URL> getJarUrls() {

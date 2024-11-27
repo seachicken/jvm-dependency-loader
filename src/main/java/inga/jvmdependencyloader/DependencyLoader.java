@@ -99,7 +99,9 @@ public class DependencyLoader implements AutoCloseable {
         // recreate the URLClassLoader because compilation path may be added dynamically
         var urls = new HashSet<>(List.of(classLoader.getURLs()));
         try {
-            urls.add(BuildTool.create(from).findCompiledClassPath().toFile().toURI().toURL());
+            for (var path : BuildTool.create(from).findCompiledClassPaths()) {
+                urls.add(path.toFile().toURI().toURL());
+            }
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
         }

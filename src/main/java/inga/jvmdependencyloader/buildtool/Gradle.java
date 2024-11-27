@@ -32,8 +32,11 @@ public class Gradle implements BuildTool {
     }
 
     @Override
-    public Path findCompiledClassPath() {
-        return root.resolve("build/classes/java/main");
+    public List<Path> findCompiledClassPaths() {
+        return List.of(
+                root.resolve("build/classes/java/main"),
+                root.resolve("build/classes/kotlin/main")
+        );
     }
 
     private List<Artifact> findArtifacts() {
