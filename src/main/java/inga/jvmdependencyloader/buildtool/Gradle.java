@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class Gradle implements BuildTool {
     private final Path gradleHome;
     private final Path root;
-    private final Pattern artifactPattern = Pattern.compile("([\\w\\.-]+):([\\w-]+)(?::| -> )([\\w\\.]+)");
+    private final Pattern artifactPattern = Pattern.compile("([\\w\\.-]+):([\\w\\.-]+)(?::| -> )([\\w\\.]+)");
 
     public Gradle(Path root) {
         gradleHome = Paths.get(System.getProperty("user.home")).resolve(".gradle");
