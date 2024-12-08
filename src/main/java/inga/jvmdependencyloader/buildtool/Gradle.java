@@ -45,10 +45,11 @@ public class Gradle implements BuildTool {
             return Collections.emptyList();
         }
         try {
-            var process = new ProcessBuilder(
+            var builder = new ProcessBuilder(
                     "./gradlew", "-q", "dependencies", "--configuration", "compileClasspath")
-                    .directory(root.toFile())
-                    .start();
+                    .directory(root.toFile());
+            System.getenv().forEach(builder.environment()::put);
+            var process = builder.start();
             process.waitFor();
             try (var reader = process.inputReader()) {
                 var results = new ArrayList<Artifact>();
