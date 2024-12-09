@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Gradle implements BuildTool {
     private final Path gradleHome;
@@ -49,7 +50,13 @@ public class Gradle implements BuildTool {
                     "./gradlew", "-q", "dependencies", "--configuration", "compileClasspath")
                     .directory(root.toFile())
                     .start();
-            process.waitFor();
+            var exitCode = process.waitFor();
+            if (exitCode != 0) {
+                try (var reader = process.errorReader()) {
+                    System.err.println(reader.lines().collect(Collectors.joining(System.lineSeparator())));
+                }
+                return Collections.emptyList();
+            }
             try (var reader = process.inputReader()) {
                 var results = new ArrayList<Artifact>();
                 for (var line : reader.lines().toList()) {
@@ -66,7 +73,9 @@ public class Gradle implements BuildTool {
     }
 
     private URL findJarUrl(Artifact artifact) {
-        var caches = gradleHome.resolve("caches");
+        var caches = System.getenv("GRADLE_RO_DEP_CACHE") == null
+                ? gradleHome.resolve("caches")
+                : Path.of(System.getenv("GRADLE_RO_DEP_CACHE"));
         var pattern = "glob:"
                 + String.join(
                 File.separator,
