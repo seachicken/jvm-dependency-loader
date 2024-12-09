@@ -5,7 +5,9 @@ import java.net.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Maven implements BuildTool {
     private final Path root;
@@ -34,7 +36,13 @@ public class Maven implements BuildTool {
                     "-q")
                     .directory(root.toFile())
                     .start();
-            process.waitFor();
+            var exitCode = process.waitFor();
+            if (exitCode != 0) {
+                try (var reader = process.errorReader()) {
+                    System.err.println(reader.lines().collect(Collectors.joining(System.lineSeparator())));
+                }
+                return Collections.emptyList();
+            }
             try (var reader = process.inputReader()) {
                 var results = new ArrayList<URL>();
                 for (var path : reader.lines().flatMap(l -> Arrays.stream(l.split(":"))).toList()) {
