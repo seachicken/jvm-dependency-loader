@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 public class DependencyLoader implements AutoCloseable {
     private final Map<Path, URLClassLoader> classLoaders = new HashMap<>();
 
-    public List<Method> readMethods(String fqcn, Path from) {
-        try (URLClassLoader classLoader = loadClassLoader(from)) {
+    public List<Method> readMethods(String fqcn, Path from, Path root) {
+        try (URLClassLoader classLoader = loadClassLoader(from, root)) {
             if (classLoader == null) {
                 System.err.println("classLoader is not found. from: " + from);
                 return Collections.emptyList();
@@ -35,8 +35,8 @@ public class DependencyLoader implements AutoCloseable {
         }
     }
 
-    public List<Clazz> readClasses(String fqcn, Path from) {
-        try (URLClassLoader classLoader = loadClassLoader(from)) {
+    public List<Clazz> readClasses(String fqcn, Path from, Path root) {
+        try (URLClassLoader classLoader = loadClassLoader(from, root)) {
             if (classLoader == null) {
                 System.err.println("classLoader is not found. from: " + from);
                 return Collections.emptyList();
@@ -52,8 +52,8 @@ public class DependencyLoader implements AutoCloseable {
         }
     }
 
-    public List<Type> readHierarchy(String fqcn, Path from) {
-        try (URLClassLoader classLoader = loadClassLoader(from)) {
+    public List<Type> readHierarchy(String fqcn, Path from, Path root) {
+        try (URLClassLoader classLoader = loadClassLoader(from, root)) {
             if (classLoader == null) {
                 System.err.println("classLoader is not found. from: " + from);
                 return Collections.emptyList();
@@ -84,7 +84,7 @@ public class DependencyLoader implements AutoCloseable {
         }
     }
 
-    private URLClassLoader loadClassLoader(Path from) {
+    private URLClassLoader loadClassLoader(Path from, Path root) {
         if (from == null) {
             return null;
         }
@@ -92,14 +92,14 @@ public class DependencyLoader implements AutoCloseable {
         if (classLoaders.containsKey(from)) {
             classLoader = classLoaders.get(from);
         } else {
-            classLoader = BuildTool.create(from).load();
+            classLoader = BuildTool.create(from, root).load();
             classLoaders.put(from, classLoader);
         }
 
         // recreate the URLClassLoader because compilation path may be added dynamically
         var urls = new HashSet<>(List.of(classLoader.getURLs()));
         try {
-            for (var path : BuildTool.create(from).findCompiledClassPaths()) {
+            for (var path : BuildTool.create(from, root).findCompiledClassPaths()) {
                 urls.add(path.toFile().toURI().toURL());
             }
         } catch (MalformedURLException e) {

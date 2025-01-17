@@ -28,6 +28,7 @@ class DependencyLoaderTest {
         void readMethodsWithDependencies() {
             var actual = loader.readMethods(
                     "org.joda.time.DateTime",
+                    TestHelper.getFixturesPath("spring-boot-realworld-example-app"),
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app")
             );
             assertThat(actual).size().isEqualTo(144);
@@ -37,6 +38,7 @@ class DependencyLoaderTest {
         void readMethodsWithCompiledClass() {
             var actual = loader.readMethods(
                     "io.spring.core.article.Article",
+                    TestHelper.getFixturesPath("spring-boot-realworld-example-app"),
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app")
             );
             assertThat(actual).size().isEqualTo(20);
@@ -46,6 +48,7 @@ class DependencyLoaderTest {
         void readHierarchy() {
             var actual = loader.readHierarchy(
                     "java.lang.String",
+                    TestHelper.getFixturesPath("spring-boot-realworld-example-app"),
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app")
             ).stream().filter(t -> !t.isInterface()).collect(Collectors.toList());
             assertThat(actual).containsExactly(
@@ -61,7 +64,8 @@ class DependencyLoaderTest {
         void readMethodsWithDependencies() {
             var actual = loader.readMethods(
                     "org.springframework.web.util.UriComponentsBuilder",
-                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
+                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service"),
+                    TestHelper.getFixturesPath("spring-tutorials")
             );
             assertThat(actual).size().isEqualTo(50);
         }
@@ -70,7 +74,8 @@ class DependencyLoaderTest {
         void readMethodsWithCompiledClass() {
             var actual = loader.readMethods(
                     "com.baeldung.apiservice.adapters.tasks.Task",
-                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
+                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service"),
+                    TestHelper.getFixturesPath("spring-tutorials")
             );
             assertThat(actual).size().isEqualTo(15);
         }
@@ -79,6 +84,7 @@ class DependencyLoaderTest {
         void readMethodsWithList() {
             var actual = loader.readMethods(
                     "java.lang.String",
+                    TestHelper.getFixturesPath("spring-tutorials"),
                     TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
             );
             assertThat(actual).size().isEqualTo(92);
@@ -88,7 +94,8 @@ class DependencyLoaderTest {
         void readClasses() {
             var actual = loader.readClasses(
                     "com.baeldung.classfile.Outer",
-                    TestHelper.getFixturesPath("spring-tutorials/core-java-modules/core-java-lang-oop-types")
+                    TestHelper.getFixturesPath("spring-tutorials/core-java-modules/core-java-lang-oop-types"),
+                    TestHelper.getFixturesPath("spring-tutorials")
             );
             assertThat(actual).map(Clazz::name).containsExactlyInAnyOrder(
                     "com.baeldung.classfile.Outer$Color",
@@ -102,7 +109,8 @@ class DependencyLoaderTest {
         void readHierarchy() {
             var actual = loader.readHierarchy(
                     "java.lang.String",
-                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
+                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service"),
+                    TestHelper.getFixturesPath("spring-tutorials")
             ).stream().filter(t -> !t.isInterface()).collect(Collectors.toList());
             assertThat(actual).containsExactly(
                     new Type("java.lang.Object", false, false),

@@ -13,7 +13,10 @@ class GradleTest {
 
     @BeforeEach
     void setUp() {
-        gradle = new Gradle(TestHelper.getFixturesPath("spring-boot-realworld-example-app"));
+        gradle = new Gradle(
+                TestHelper.getFixturesPath("spring-boot-realworld-example-app"),
+                TestHelper.getFixturesPath("spring-boot-realworld-example-app")
+        );
     }
 
     @Test

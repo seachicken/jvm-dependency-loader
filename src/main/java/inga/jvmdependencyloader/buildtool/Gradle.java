@@ -16,12 +16,14 @@ import java.util.stream.Collectors;
 
 public class Gradle implements BuildTool {
     private final Path gradleHome;
-    private final Path root;
+    private final Path subProjectPath;
+    private final Path rootProjectPath;
     private final Pattern artifactPattern = Pattern.compile("([\\w\\.-]+):([\\w\\.-]+)(?::| -> )([\\w\\.]+)");
 
-    public Gradle(Path root) {
+    public Gradle(Path subProjectPath, Path rootProjectPath) {
         gradleHome = Paths.get(System.getProperty("user.home")).resolve(".gradle");
-        this.root = root;
+        this.subProjectPath = subProjectPath;
+        this.rootProjectPath = rootProjectPath;
     }
 
     @Override
@@ -35,20 +37,20 @@ public class Gradle implements BuildTool {
     @Override
     public List<Path> findCompiledClassPaths() {
         return List.of(
-                root.resolve("build/classes/java/main"),
-                root.resolve("build/classes/kotlin/main")
+                subProjectPath.resolve("build/classes/java/main"),
+                subProjectPath.resolve("build/classes/kotlin/main")
         );
     }
 
     private List<Artifact> findArtifacts() {
-        if (!Files.exists(root.resolve("gradlew"))) {
-            System.err.println("gradlew is not found in " + root);
+        if (!Files.exists(rootProjectPath.resolve("gradlew"))) {
+            System.err.println("gradlew is not found in " + rootProjectPath);
             return Collections.emptyList();
         }
         try {
             var process = new ProcessBuilder(
                     "./gradlew", "-q", "dependencies", "--configuration", "compileClasspath")
-                    .directory(root.toFile())
+                    .directory(rootProjectPath.toFile())
                     .start();
             var exitCode = process.waitFor();
             if (exitCode != 0) {

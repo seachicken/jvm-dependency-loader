@@ -10,18 +10,18 @@ public interface BuildTool {
     URLClassLoader load();
     List<Path> findCompiledClassPaths();
 
-    static BuildTool create(Path root) {
-        try (var stream = Files.list(root)) {
+    static BuildTool create(Path subProjectPath, Path rootProjectPath) {
+        try (var stream = Files.list(subProjectPath)) {
             var fileNames = stream
                     .filter(Files::isRegularFile)
                     .map(p -> p.getFileName().toString())
                     .toList();
             if (fileNames.contains("pom.xml")) {
-                return new Maven(root);
+                return new Maven(subProjectPath);
             } else if (fileNames.contains("build.gradle")) {
-                return new Gradle(root);
+                return new Gradle(subProjectPath, rootProjectPath);
             } else if (fileNames.contains("build.gradle.kts")) {
-                return new Gradle(root);
+                return new Gradle(subProjectPath, rootProjectPath);
             }
             throw new IllegalArgumentException("no build tool found");
         } catch (IOException e) {
