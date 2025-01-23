@@ -13,6 +13,7 @@ public class Main {
             while (scanner.hasNextLine()) {
                 var input = mapper.readValue(scanner.nextLine(), Input.class);
                 var result = switch (input.type()) {
+                    case CLASS_PATHS -> resolver.getClassPaths(Path.of(input.from()), Path.of(input.root()));
                     case METHODS -> resolver.readMethods(input.fqcn(), Path.of(input.from()), Path.of(input.root()));
                     case CLASSES -> resolver.readClasses(input.fqcn(), Path.of(input.from()), Path.of(input.root()));
                     case HIERARCHY -> resolver.readHierarchy(input.fqcn(), Path.of(input.from()), Path.of(input.root()));

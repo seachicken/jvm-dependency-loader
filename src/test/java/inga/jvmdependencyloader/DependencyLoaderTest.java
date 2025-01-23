@@ -25,6 +25,15 @@ class DependencyLoaderTest {
     @Nested
     class Gradle {
         @Test
+        void getDependencyClassPaths() {
+            var actual = loader.getClassPaths(
+                    TestHelper.getFixturesPath("spring-boot-realworld-example-app"),
+                    TestHelper.getFixturesPath("spring-boot-realworld-example-app")
+            );
+            assertThat(actual).size().isEqualTo(88);
+        }
+
+        @Test
         void readMethodsWithDependencies() {
             var actual = loader.readMethods(
                     "org.joda.time.DateTime",
@@ -60,6 +69,15 @@ class DependencyLoaderTest {
 
     @Nested
     class Maven {
+        @Test
+        void getDependencyClassPaths() {
+            var actual = loader.getClassPaths(
+                    TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service"),
+                    TestHelper.getFixturesPath("spring-tutorials")
+            );
+            assertThat(actual).size().isEqualTo(54);
+        }
+
         @Test
         void readMethodsWithDependencies() {
             var actual = loader.readMethods(

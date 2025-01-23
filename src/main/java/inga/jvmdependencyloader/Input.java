@@ -7,6 +7,7 @@ public record Input(
         String root
 ) {
     public enum Type {
+        CLASS_PATHS,
         METHODS,
         CLASSES,
         HIERARCHY
