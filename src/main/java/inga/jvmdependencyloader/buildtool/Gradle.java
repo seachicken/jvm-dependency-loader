@@ -48,11 +48,13 @@ public class Gradle implements BuildTool {
             return Collections.emptyList();
         }
         try {
+            System.err.println("begin gradlew");
             var process = new ProcessBuilder(
                     "./gradlew", "-q", "dependencies", "--configuration", "compileClasspath")
                     .directory(rootProjectPath.toFile())
                     .start();
             var exitCode = process.waitFor();
+            System.err.println("end gradlew");
             if (exitCode != 0) {
                 try (var reader = process.errorReader()) {
                     System.err.println(reader.lines().collect(Collectors.joining(System.lineSeparator())));
@@ -69,7 +71,8 @@ public class Gradle implements BuildTool {
                 }
                 return results.stream().distinct().toList();
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
             throw new IllegalArgumentException(e);
         }
     }
