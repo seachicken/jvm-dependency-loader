@@ -69,6 +69,7 @@ public class Gradle implements BuildTool {
                         results.add(new Artifact(matcher.group(1), matcher.group(2), matcher.group(3)));
                     }
                 }
+                System.err.println("gradlew results: " + results.stream().distinct().toList());
                 return results.stream().distinct().toList();
             }
         } catch (Exception e) {
