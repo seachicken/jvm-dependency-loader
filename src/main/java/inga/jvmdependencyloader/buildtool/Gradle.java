@@ -2,8 +2,10 @@ package inga.jvmdependencyloader.buildtool;
 
 import inga.jvmdependencyloader.Artifact;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.*;
@@ -49,6 +51,19 @@ public class Gradle implements BuildTool {
         }
         try {
             System.err.println("begin gradlew");
+            var java = new ProcessBuilder(
+                    "java", "-version")
+                    .directory(rootProjectPath.toFile())
+                    .redirectErrorStream(true)
+                    .start();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(java.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.err.println("java line: " + line);
+                }
+            }
+            var javaExit = java.waitFor();
+            System.err.println("java code: " + javaExit);
             var process = new ProcessBuilder(
                     "./gradlew", "-q", "dependencies", "--configuration", "compileClasspath")
                     .directory(rootProjectPath.toFile())
