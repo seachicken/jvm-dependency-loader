@@ -22,6 +22,7 @@ public class DependencyLoader implements AutoCloseable {
                 System.err.println("classLoader is not found. from: " + from);
                 return Collections.emptyList();
             }
+            System.err.println("get getClassPaths: " + Arrays.toString(classLoaders.get(from).getURLs()));
             return Stream.of(classLoaders.get(from).getURLs())
                     .map(URL::getPath)
                     .collect(Collectors.toList());
