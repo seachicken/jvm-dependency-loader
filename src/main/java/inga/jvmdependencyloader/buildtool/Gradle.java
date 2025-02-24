@@ -54,7 +54,7 @@ public class Gradle implements BuildTool {
                     .directory(rootProjectPath.toFile())
                     .start();
             var exitCode = process.waitFor();
-            System.err.println("end gradlew");
+            System.err.println("end gradlew. exitCode: " + exitCode);
             if (exitCode != 0) {
                 try (var reader = process.errorReader()) {
                     System.err.println(reader.lines().collect(Collectors.joining(System.lineSeparator())));
@@ -73,6 +73,7 @@ public class Gradle implements BuildTool {
                 return results.stream().distinct().toList();
             }
         } catch (Exception e) {
+            System.err.println("error occurred!");
             e.printStackTrace(System.err);
             throw new IllegalArgumentException(e);
         }
