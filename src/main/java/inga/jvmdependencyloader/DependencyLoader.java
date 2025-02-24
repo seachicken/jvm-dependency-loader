@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,6 +16,7 @@ public class DependencyLoader implements AutoCloseable {
     private final Map<Path, URLClassLoader> classLoaders = new HashMap<>();
 
     public List<String> getClassPaths(Path from, Path root) {
+        System.err.println("begin getClassPaths. from: " + from);
         try (URLClassLoader classLoader = loadClassLoader(from, root)) {
             if (classLoader == null) {
                 System.err.println("classLoader is not found. from: " + from);
@@ -23,7 +25,7 @@ public class DependencyLoader implements AutoCloseable {
             return Stream.of(classLoaders.get(from).getURLs())
                     .map(URL::getPath)
                     .collect(Collectors.toList());
-        } catch (NoClassDefFoundError | IOException e) {
+        } catch (NoClassDefFoundError | Exception e) {
             e.printStackTrace(System.err);
             return Collections.emptyList();
         }
