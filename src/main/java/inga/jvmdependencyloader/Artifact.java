@@ -1,7 +1,10 @@
 package inga.jvmdependencyloader;
 
-public record Artifact(
-        String groupId,
-        String artifactId,
-        String version
-) {}
+import lombok.Data;
+
+@Data
+public class Artifact {
+    private final String groupId;
+    private final String artifactId;
+    private final String version;
+}

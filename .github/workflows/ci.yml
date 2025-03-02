@@ -28,10 +28,5 @@ jobs:
         (cd ./src/test/resources/fixtures/spring-tutorials/lightrun && mvn compile)
         (cd ./src/test/resources/fixtures/spring-tutorials/core-java-modules/core-java-lang-oop-types && mvn compile)
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
     - name: Build with Gradle Wrapper
       run: ./gradlew build

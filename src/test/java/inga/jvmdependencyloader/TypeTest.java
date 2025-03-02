@@ -8,6 +8,6 @@ class TypeTest {
     @Test
     void convertNameByClassLoaderWithArray() {
         // L[java.lang.String; -> java.lang.String
-        assertThat(new Type(String[].class).name()).isEqualTo("java.lang.String");
+        assertThat(new Type(String[].class).getName()).isEqualTo("java.lang.String");
     }
 }

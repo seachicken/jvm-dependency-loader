@@ -36,15 +36,15 @@ public class DependencyLoader implements AutoCloseable {
                 return Collections.emptyList();
             }
 
-            var methods = classLoader.loadClass(fqcn).getMethods();
-            return Arrays.stream(methods)
+            java.lang.reflect.Method[] methods = classLoader.loadClass(fqcn).getMethods();
+            return new ArrayList<>(Arrays.stream(methods)
                     .map(Method::new)
                     .collect(Collectors.toMap(
-                            (m) -> m.name() + m.parameterTypes(),
+                            (m) -> m.getName() + m.getParameterTypes(),
                             (m) -> m,
-                            (a, b) -> a.returnType().isInterface() ? b : a
+                            (a, b) -> a.getReturnType().isInterface() ? b : a
                     ))
-                    .values().stream().toList();
+                    .values());
         } catch (ClassNotFoundException | NoClassDefFoundError | IOException e) {
             e.printStackTrace(System.err);
             return Collections.emptyList();
@@ -58,7 +58,7 @@ public class DependencyLoader implements AutoCloseable {
                 return Collections.emptyList();
             }
 
-            var classes = classLoader.loadClass(fqcn).getDeclaredClasses();
+            Class<?>[] classes = classLoader.loadClass(fqcn).getDeclaredClasses();
             return Arrays.stream(classes)
                     .map(c -> new Clazz(c.getName()))
                     .collect(Collectors.toList());
@@ -75,18 +75,18 @@ public class DependencyLoader implements AutoCloseable {
                 return Collections.emptyList();
             }
 
-            var results = new ArrayList<Type>();
-            var stack = new Stack<Class<?>>();
+            ArrayList<Type> results = new ArrayList<>();
+            Stack<Class<?>> stack = new Stack<>();
             stack.push(classLoader.loadClass(fqcn));
             while (!stack.isEmpty()) {
-                var clazz = stack.pop();
+                Class<?> clazz = stack.pop();
                 results.add(new Type(clazz));
-                var parents = new ArrayList<>(List.of(clazz.getInterfaces()));
+                ArrayList<Class<?>> parents = new ArrayList<>(Arrays.asList(clazz.getInterfaces()));
                 if (clazz.getSuperclass() != null) {
                     parents.add(clazz.getSuperclass());
                 }
-                for (var parent : parents) {
-                    if (results.stream().noneMatch(t -> t.name().equals(parent.getName()))
+                for (Class<?> parent : parents) {
+                    if (results.stream().noneMatch(t -> t.getName().equals(parent.getName()))
                             && !stack.contains(parent)) {
                         stack.push(parent);
                     }
@@ -113,9 +113,9 @@ public class DependencyLoader implements AutoCloseable {
         }
 
         // recreate the URLClassLoader because compilation path may be added dynamically
-        var urls = new HashSet<>(List.of(classLoader.getURLs()));
+        HashSet<URL> urls = new HashSet<>(Arrays.asList(classLoader.getURLs()));
         try {
-            for (var path : BuildTool.create(from, root).findCompiledClassPaths()) {
+            for (Path path : BuildTool.create(from, root).findCompiledClassPaths()) {
                 urls.add(path.toFile().toURI().toURL());
             }
         } catch (MalformedURLException e) {
@@ -126,7 +126,7 @@ public class DependencyLoader implements AutoCloseable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        classLoader = new URLClassLoader(urls.toArray(URL[]::new));
+        classLoader = new URLClassLoader(new ArrayList<>(urls).toArray(new URL[0]));
         classLoaders.put(from, classLoader);
 
         return classLoader;
@@ -134,7 +134,7 @@ public class DependencyLoader implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        for (var loader : classLoaders.values()) {
+        for (URLClassLoader loader : classLoaders.values()) {
             loader.close();
         }
     }
