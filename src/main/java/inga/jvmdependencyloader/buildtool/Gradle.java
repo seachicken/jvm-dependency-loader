@@ -2,17 +2,18 @@ package inga.jvmdependencyloader.buildtool;
 
 import inga.jvmdependencyloader.Artifact;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Gradle implements BuildTool {
     private final Path gradleHome;
@@ -36,7 +37,7 @@ public class Gradle implements BuildTool {
 
     @Override
     public List<Path> findCompiledClassPaths() {
-        return List.of(
+        return Arrays.asList(
                 subProjectPath.resolve("build/classes/java/main"),
                 subProjectPath.resolve("build/classes/kotlin/main")
         );
@@ -48,26 +49,26 @@ public class Gradle implements BuildTool {
             return Collections.emptyList();
         }
         try {
-            var process = new ProcessBuilder(
+            Process process = new ProcessBuilder(
                     "./gradlew", "-q", "dependencies", "--configuration", "compileClasspath")
                     .directory(rootProjectPath.toFile())
                     .start();
-            var exitCode = process.waitFor();
+            int exitCode = process.waitFor();
             if (exitCode != 0) {
-                try (var reader = process.errorReader()) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
                     System.err.println(reader.lines().collect(Collectors.joining(System.lineSeparator())));
                 }
                 return Collections.emptyList();
             }
-            try (var reader = process.inputReader()) {
-                var results = new ArrayList<Artifact>();
-                for (var line : reader.lines().toList()) {
-                    var matcher = artifactPattern.matcher(line);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                ArrayList<Artifact> results = new ArrayList<>();
+                for (String line : reader.lines().collect(Collectors.toList())) {
+                    Matcher matcher = artifactPattern.matcher(line);
                     if (matcher.find()) {
                         results.add(new Artifact(matcher.group(1), matcher.group(2), matcher.group(3)));
                     }
                 }
-                return results.stream().distinct().toList();
+                return results.stream().distinct().collect(Collectors.toList());
             }
         } catch (IOException | InterruptedException e) {
             throw new IllegalArgumentException(e);
@@ -75,23 +76,23 @@ public class Gradle implements BuildTool {
     }
 
     private URL findJarUrl(Artifact artifact) {
-        var caches = System.getenv("GRADLE_RO_DEP_CACHE") == null
+        Path caches = System.getenv("GRADLE_RO_DEP_CACHE") == null
                 ? gradleHome.resolve("caches")
-                : Path.of(System.getenv("GRADLE_RO_DEP_CACHE"));
-        var pattern = "glob:"
+                : Paths.get(System.getenv("GRADLE_RO_DEP_CACHE"));
+        String pattern = "glob:"
                 + String.join(
                 File.separator,
                 caches.toString(),
                 "modules-*",
                 "files-*",
-                artifact.groupId(),
-                artifact.artifactId(),
-                artifact.version(),
+                artifact.getGroupId(),
+                artifact.getArtifactId(),
+                artifact.getVersion(),
                 "*",
-                artifact.artifactId() + '-' + artifact.version() + ".jar");
-        try (var stream = Files.walk(caches, 7)) {
-            var matcher = FileSystems.getDefault().getPathMatcher(pattern);
-            var path = stream.filter(matcher::matches).findFirst().orElse(null);
+                artifact.getArtifactId() + '-' + artifact.getVersion() + ".jar");
+        try (Stream<Path> stream = Files.walk(caches, 7)) {
+            PathMatcher matcher = FileSystems.getDefault().getPathMatcher(pattern);
+            Path path = stream.filter(matcher::matches).findFirst().orElse(null);
             return path == null ? null : path.toUri().toURL();
         } catch (IOException e) {
             throw new IllegalArgumentException(e);

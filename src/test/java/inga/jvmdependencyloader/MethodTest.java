@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MethodTest {
     @Test
     void createMethod() throws Exception {
-        assertThat(new Method(Class.forName("java.lang.String").getMethod("toString")).name())
+        assertThat(new Method(Class.forName("java.lang.String").getMethod("toString")).getName())
                 .isEqualTo("java.lang.String.toString");
     }
 

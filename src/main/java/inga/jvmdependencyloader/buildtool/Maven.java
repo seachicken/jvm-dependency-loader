@@ -1,8 +1,11 @@
 package inga.jvmdependencyloader.buildtool;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,17 +21,17 @@ public class Maven implements BuildTool {
 
     @Override
     public URLClassLoader load() {
-        return new URLClassLoader(getJarUrls().toArray(URL[]::new));
+        return new URLClassLoader(getJarUrls().toArray(new URL[0]));
     }
 
     @Override
     public List<Path> findCompiledClassPaths() {
-        return List.of(root.resolve("target/classes"));
+        return Collections.singletonList(root.resolve("target/classes"));
     }
 
     private List<URL> getJarUrls() {
         try {
-            var process = new ProcessBuilder(
+            Process process = new ProcessBuilder(
                     "mvn",
                     "dependency:build-classpath",
                     "-DincludeScope=compile",
@@ -36,17 +39,17 @@ public class Maven implements BuildTool {
                     "-q")
                     .directory(root.toFile())
                     .start();
-            var exitCode = process.waitFor();
+            int exitCode = process.waitFor();
             if (exitCode != 0) {
-                try (var reader = process.errorReader()) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
                     System.err.println(reader.lines().collect(Collectors.joining(System.lineSeparator())));
                 }
                 return Collections.emptyList();
             }
-            try (var reader = process.inputReader()) {
-                var results = new ArrayList<URL>();
-                for (var path : reader.lines().flatMap(l -> Arrays.stream(l.split(":"))).toList()) {
-                    results.add(Path.of(path).toUri().toURL());
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                ArrayList<URL> results = new ArrayList<>();
+                for (String path : reader.lines().flatMap(l -> Arrays.stream(l.split(":"))).collect(Collectors.toList())) {
+                    results.add(Paths.get(path).toUri().toURL());
                 }
                 return results;
             }

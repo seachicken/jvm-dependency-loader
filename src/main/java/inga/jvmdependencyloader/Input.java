@@ -1,11 +1,14 @@
 package inga.jvmdependencyloader;
 
-public record Input(
-        Type type,
-        String fqcn,
-        String from,
-        String root
-) {
+import lombok.Data;
+
+@Data
+public class Input {
+    private final Type type;
+    private final String fqcn;
+    private final String from;
+    private final String root;
+
     public enum Type {
         CLASS_PATHS,
         METHODS,
