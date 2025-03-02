@@ -1,4 +1,0 @@
-tasks.register('ingaCopyDependencies', Copy) {
-    from(configurations.compileClasspath)
-    into("$projectDir/target/dependency")
-}
