@@ -1,13 +1,15 @@
 package inga.jvmdependencyloader;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class Input {
-    private final Type type;
-    private final String fqcn;
-    private final String from;
-    private final String root;
+    private Type type;
+    private String fqcn;
+    private String from;
+    private String root;
 
     public enum Type {
         CLASS_PATHS,

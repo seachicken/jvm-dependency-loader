@@ -1,5 +1,6 @@
 package inga.jvmdependencyloader;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -7,7 +8,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class Type {
     private final String name;
+    @JsonProperty("isInterface")
     private final boolean isInterface;
+    @JsonProperty("isArray")
     private final boolean isArray;
 
     public Type(Class<?> clazz) {
