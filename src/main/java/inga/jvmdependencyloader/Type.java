@@ -1,28 +1,21 @@
 package inga.jvmdependencyloader;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor
-public class Type {
-    private final String name;
-    private final boolean isInterface;
-    private final boolean isArray;
-
-    public Type(Class<?> clazz) {
-        name = toLoadableName(clazz);
-        isInterface = clazz.isInterface();
-        isArray = isArray(clazz);
+public record Type(
+        String name,
+        boolean isInterface,
+        boolean isArray
+) {
+    public Type(Class clazz) {
+        this(toLoadableName(clazz), clazz.isInterface(), isArray(clazz));
     }
 
-    private static String toLoadableName(Class<?> clazz) {
+    private static String toLoadableName(Class clazz) {
         return isArray(clazz)
-                ? clazz.getComponentType().getName()
+                ? clazz.componentType().getName()
                 : clazz.getName();
     }
 
-    private static boolean isArray(Class<?> clazz) {
-        return clazz.getComponentType() != null;
+    private static boolean isArray(Class clazz) {
+        return clazz.componentType() != null;
     }
 }

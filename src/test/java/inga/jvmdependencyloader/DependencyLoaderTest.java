@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +26,7 @@ class DependencyLoaderTest {
     class Gradle {
         @Test
         void getDependencyClassPaths() {
-            List<String> actual = loader.getClassPaths(
+            var actual = loader.getClassPaths(
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app"),
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app")
             );
@@ -36,7 +35,7 @@ class DependencyLoaderTest {
 
         @Test
         void readMethodsWithDependencies() {
-            List<Method> actual = loader.readMethods(
+            var actual = loader.readMethods(
                     "org.joda.time.DateTime",
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app"),
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app")
@@ -46,7 +45,7 @@ class DependencyLoaderTest {
 
         @Test
         void readMethodsWithCompiledClass() {
-            List<Method> actual = loader.readMethods(
+            var actual = loader.readMethods(
                     "io.spring.core.article.Article",
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app"),
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app")
@@ -56,7 +55,7 @@ class DependencyLoaderTest {
 
         @Test
         void readHierarchy() {
-            List<Type> actual = loader.readHierarchy(
+            var actual = loader.readHierarchy(
                     "java.lang.String",
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app"),
                     TestHelper.getFixturesPath("spring-boot-realworld-example-app")
@@ -72,7 +71,7 @@ class DependencyLoaderTest {
     class Maven {
         @Test
         void getDependencyClassPaths() {
-            List<String> actual = loader.getClassPaths(
+            var actual = loader.getClassPaths(
                     TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service"),
                     TestHelper.getFixturesPath("spring-tutorials")
             );
@@ -81,7 +80,7 @@ class DependencyLoaderTest {
 
         @Test
         void readMethodsWithDependencies() {
-            List<Method> actual = loader.readMethods(
+            var actual = loader.readMethods(
                     "org.springframework.web.util.UriComponentsBuilder",
                     TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service"),
                     TestHelper.getFixturesPath("spring-tutorials")
@@ -91,7 +90,7 @@ class DependencyLoaderTest {
 
         @Test
         void readMethodsWithCompiledClass() {
-            List<Method> actual = loader.readMethods(
+            var actual = loader.readMethods(
                     "com.baeldung.apiservice.adapters.tasks.Task",
                     TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service"),
                     TestHelper.getFixturesPath("spring-tutorials")
@@ -101,7 +100,7 @@ class DependencyLoaderTest {
 
         @Test
         void readMethodsWithList() {
-            List<Method> actual = loader.readMethods(
+            var actual = loader.readMethods(
                     "java.lang.String",
                     TestHelper.getFixturesPath("spring-tutorials"),
                     TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service")
@@ -111,12 +110,12 @@ class DependencyLoaderTest {
 
         @Test
         void readClasses() {
-            List<Clazz> actual = loader.readClasses(
+            var actual = loader.readClasses(
                     "com.baeldung.classfile.Outer",
                     TestHelper.getFixturesPath("spring-tutorials/core-java-modules/core-java-lang-oop-types"),
                     TestHelper.getFixturesPath("spring-tutorials")
             );
-            assertThat(actual).map(Clazz::getName).containsExactlyInAnyOrder(
+            assertThat(actual).map(Clazz::name).containsExactlyInAnyOrder(
                     "com.baeldung.classfile.Outer$Color",
                     "com.baeldung.classfile.Outer$HelloOuter",
                     "com.baeldung.classfile.Outer$Nested",
@@ -126,7 +125,7 @@ class DependencyLoaderTest {
 
         @Test
         void readHierarchy() {
-            List<Type> actual = loader.readHierarchy(
+            var actual = loader.readHierarchy(
                     "java.lang.String",
                     TestHelper.getFixturesPath("spring-tutorials/lightrun/api-service"),
                     TestHelper.getFixturesPath("spring-tutorials")

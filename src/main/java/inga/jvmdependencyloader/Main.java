@@ -2,32 +2,23 @@ package inga.jvmdependencyloader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ObjectMapper mapper = new ObjectMapper();
-        try (DependencyLoader resolver = new DependencyLoader()) {
+        var mapper = new ObjectMapper();
+        try (var resolver = new DependencyLoader()) {
             while (scanner.hasNextLine()) {
-                Input input = mapper.readValue(scanner.nextLine(), Input.class);
-                Object result = null;
-                switch (input.getType()) {
-                    case CLASS_PATHS:
-                        result = resolver.getClassPaths(Paths.get(input.getFrom()), Paths.get(input.getRoot()));
-                        break;
-                    case METHODS:
-                        result = resolver.readMethods(input.getFqcn(), Paths.get(input.getFrom()), Paths.get(input.getRoot()));
-                        break;
-                    case CLASSES:
-                        result = resolver.readClasses(input.getFqcn(), Paths.get(input.getFrom()), Paths.get(input.getRoot()));
-                        break;
-                    case HIERARCHY:
-                        result = resolver.readHierarchy(input.getFqcn(), Paths.get(input.getFrom()), Paths.get(input.getRoot()));
-                        break;
-                }
-                String json = mapper.writeValueAsString(result);
+                var input = mapper.readValue(scanner.nextLine(), Input.class);
+                var result = switch (input.type()) {
+                    case CLASS_PATHS -> resolver.getClassPaths(Path.of(input.from()), Path.of(input.root()));
+                    case METHODS -> resolver.readMethods(input.fqcn(), Path.of(input.from()), Path.of(input.root()));
+                    case CLASSES -> resolver.readClasses(input.fqcn(), Path.of(input.from()), Path.of(input.root()));
+                    case HIERARCHY -> resolver.readHierarchy(input.fqcn(), Path.of(input.from()), Path.of(input.root()));
+                };
+                var json = mapper.writeValueAsString(result);
                 System.out.println(json);
             }
         } catch (Exception e) {

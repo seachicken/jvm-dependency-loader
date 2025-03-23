@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
-import java.net.URLClassLoader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +21,7 @@ class GradleTest {
 
     @Test
     void loadWithDirectDependency() throws Exception {
-        URLClassLoader classLoader = gradle.load();
+        var classLoader = gradle.load();
         assertThat(classLoader.getURLs())
                 .extracting(URL::getPath)
                 .anyMatch(p -> p.endsWith("mybatis-spring-boot-starter-2.2.2.jar"));
@@ -31,7 +30,7 @@ class GradleTest {
 
     @Test
     void loadWithTransitiveDependency() throws Exception {
-        URLClassLoader classLoader = gradle.load();
+        var classLoader = gradle.load();
         assertThat(classLoader.getURLs())
                 .extracting(URL::getPath)
                 .anyMatch(p -> p.endsWith("spring-boot-starter-validation-2.6.3.jar"));

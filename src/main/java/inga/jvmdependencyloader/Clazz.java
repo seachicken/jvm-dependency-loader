@@ -1,8 +1,5 @@
 package inga.jvmdependencyloader;
 
-import lombok.Data;
-
-@Data
-public class Clazz {
-    private final String name;
-}
+public record Clazz(
+        String name
+) {}
